@@ -42,8 +42,10 @@ export default {
       console.log('update password')
     },
     logout(){
-      console.log('logout')
-    }
+            localStorage.clear()
+            this.$router.push('/login')
+            console.log('logged out')
+        }
   }
 }
 </script>
