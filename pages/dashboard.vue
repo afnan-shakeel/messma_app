@@ -59,7 +59,6 @@ export default {
 
             var today = new Date().getDay()
             if(today == 0) today = 7
-            console.log('today',today)
             // this.selectedDay = today
             
             const configs = await this.getConfigs()
@@ -68,7 +67,6 @@ export default {
             const currentTime = new Date().toTimeString().split(' ')[0]
             console.log(currentTime)
             const currentConfigs = todaysConfigs.filter(x=> currentTime >= x.start_time && currentTime <= x.end_time )
-            console.log('currentConfigs',currentConfigs)
             if(currentConfigs.length !== 0){
                 this.selectedConfig  =  currentConfigs[0]
                 this.selectedMeal = currentConfigs[0].meal_id
@@ -77,14 +75,16 @@ export default {
             }
         },
         async getConfigs(){
-            console.log('this.mess_id',this.mess_id)
             const res = await this.$axios.get(`/menu-config/${this.mess_id}`,{
                 headers:{
                     Authorization: this.$storage.getUniversal('token')
                 }
             });
             console.log('get configs',res.data)
-            if (res.data && res.data.message !== 'Success') return false
+            if (res.data && res.data.message !== 'Success'){
+                this.$toasted.error('failed to fetch configs')
+                return false
+            }
             return res.data.data
         },
         getconfig(day,meal_id){
@@ -92,9 +92,11 @@ export default {
         },
         async getHoggVal(){
             const res = await this.$axios.get('/ext/hogg_values')
-            if(res.data && res.data.message !== 'Success') return
+            if(res.data && res.data.message !== 'Success'){
+                this.$toasted.error('failed to get hogg values')
+                return;
+            }
             this.hogg_val = res.data.data
-            console.log('x',this.hogg_val)
         },
         async markHogg(){
             console.log('mark hogg')
@@ -113,6 +115,11 @@ export default {
                 }
             });
             console.log('hogg res', res)
+            if(res.data && res.data.message === 'Success'){
+                this.$toasted.success('submitted')
+            }else{
+                this.$toasted.error('failed')
+            }
         }
     }
 }

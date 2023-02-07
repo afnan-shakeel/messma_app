@@ -26,6 +26,7 @@
     "vue-pug-plugin": "^2.0.3",
     "vue-server-renderer": "^2.7.10",
     "vue-template-compiler": "^2.7.10",
+    "vue-toasted": "^1.1.28",
     "vuetify": "^2.6.12"
   },
   "devDependencies": {

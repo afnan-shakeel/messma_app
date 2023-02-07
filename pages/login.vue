@@ -32,6 +32,11 @@ export default {
             const payload = this.form
             await this.$axios.post('/auth/login',payload)
               .then(res => {
+                if(res.data && res.data.message !== 'Success'){
+                    this.$toasted.error(res.data)
+                    console.log(res.data)
+                    return;
+                }
                 if(res.data.access_token){
                   this.$storage.setUniversal('token',res.data.access_token)
                   console.log('access token set')
@@ -43,7 +48,8 @@ export default {
                 }
               })
               .catch( err => {
-                console.log('err x ',err)
+                this.$toasted.error(err.message)
+                console.log('err x ',JSON.stringify(err))
               })
         },
         async setAuth(){

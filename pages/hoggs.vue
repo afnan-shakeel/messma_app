@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    hoggs
     <form>
         <p v-if="days && selectedDay">Day: {{ days.filter(x=> x.id === selectedDay)[0].name}}</p>
         <div v-if="configs && meals && hogg_val" data-app>
@@ -8,15 +7,18 @@
         <p v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
             <v-row>
             <v-col>
-            <v-select :rules="rules.select" v-model="item.currentStatus" :items="hogg_val" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
+            <v-select :rules="rules.select" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
             </v-col>
             <v-col>
-            <v-select :rules="rules.select" v-model="item.nextStatus" :items="hogg_val" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
+            <v-select :rules="rules.select" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
+            </v-col>
+            <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
+                <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
             </v-col>
         </v-row>
         </p>
         </div>
-        <v-btn @click="submitHogg()">submit</v-btn>
+        <v-btn v-if="payload" @click="submitHogg()">submit</v-btn>
 </form>
   </v-container>
 </template>
@@ -35,6 +37,7 @@ export default {
             nextStatus: null,
             meals: null,
             hogg_val: null,
+            payload: null,
             rules: {
                 select: [(v) => !!v || "Item is required"],
                 }
@@ -46,7 +49,6 @@ export default {
     },
     methods:{
         async getDayConfig(){
-            console.log()
             const dayRes = await this.$axios.get('/ext/days')
             const mealsRes = await this.$axios.get('/ext/meals')
             const messConfigRes = await this.$axios.get(`/mess/${this.mess_id}/config`,{
@@ -63,41 +65,53 @@ export default {
 
             var today = new Date().getDay()
             if(today == 0) today = 7
-            console.log('today', today)
             this.selectedDay = today
 
-                        
             const configs = await this.getConfigs()
             const todaysConfigs = configs.filter(x => x.day == today)
-            console.log('hogg today config',todaysConfigs)
             this.configs = todaysConfigs
         },
         async getConfigs(){
-            console.log('this.mess_id',this.mess_id)
             const res = await this.$axios.get(`/menu-config/${this.mess_id}`,{
                 headers:{
                     Authorization: this.$storage.getUniversal('token')
                 }
             });
             console.log('get configs',res.data)
-            if (res.data && res.data.message !== 'Success') return false
+            if (res.data && res.data.message !== 'Success') {
+                this.$toasted.error('failed to get configs')
+                return false
+            }
             return res.data.data
         },
         async getHoggVal(){
             const res = await this.$axios.get('/ext/hogg_values')
-            if(res.data && res.data.message !== 'Success') return
+            if(res.data && res.data.message !== 'Success') {
+                this.$toasted.error('failed to fetch hogg value')
+                return;
+            }
             this.hogg_val = res.data.data
-            console.log('x',this.hogg_val)
         },
         async submitHogg(){
             const payload = this.hoggPayload();
-            console.log('xxx',payload)
+            this.payload = payload
+            for (let item of payload){
+                if(!item.status || !item.next){
+                    this.$toasted.info('Fill required fields')
+                    return;
+                }
+            }
             const res = await this.$axios.post('/hogg',payload,{
                 headers:{
                     Authorization: this.$storage.getUniversal('token')
                 }
             });
             console.log('submit hogg res ',res)
+            if(res.data && res.data.message === 'Success'){
+                this.$toasted.success('submitted')
+            }else{
+                this.$toasted.error('failed')
+            }
         },
         hoggPayload(){
             const payloadList = []
