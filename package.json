@@ -39,8 +39,7 @@
     "eslint-plugin-nuxt": "^4.0.0",
     "eslint-plugin-vue": "^9.5.1",
     "node-sass": "^8.0.0",
-    "postcss": "^8.4.17",
-    "sass-loader": "^13.2.0",
-    "webpack": "^4.0.0"
+    "postcss": "^8.4.17"
+
   }
 }
