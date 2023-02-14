@@ -31,6 +31,7 @@ export default {
   plugins: [
     { src: '~/plugins/vue.modal', mode: 'client' },
     { src: '~/plugins/vue-toasted.js', mode: 'client' },
+    { src: '~/plugins/v-tooltip.js', mode: 'client' },
 
   ],
 

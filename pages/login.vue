@@ -41,7 +41,7 @@ export default {
                   this.$storage.setUniversal('token',res.data.access_token)
                   console.log('access token set')
                   this.setAuth();
-                  this.$router.push('/dashboard')
+                  this.$router.push('/hoggs')
                 }else{
                 //   this.$toasted.error('invalid')
                   console.log('xx',this.$storage.getUniversal('token'))

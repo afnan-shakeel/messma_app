@@ -6,16 +6,16 @@
       <v-bottom-navigation
       color="primary"
     >
-      <v-btn>
+      <!-- <v-btn>
         <span>Home</span>
   
         <v-icon @click="toDashboard()">mdi-home</v-icon>
-      </v-btn>
+      </v-btn> -->
   
       <v-btn>
-        <span>O</span>
+        <span>Home</span>
   
-        <v-icon @click="toHoggs()">mdi-heart</v-icon>
+        <v-icon @click="toHoggs()">mdi-home</v-icon>
       </v-btn>
   
       <v-btn>
@@ -31,9 +31,9 @@
   export default {
     name:'SessionLayout',
     methods:{
-        toDashboard(){
-            this.$router.push('/dashboard')
-        },
+        // toDashboard(){
+        //     this.$router.push('/dashboard')
+        // },
         toProfile(){
             this.$router.push('/profile')
         },

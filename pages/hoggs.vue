@@ -9,16 +9,18 @@
             <v-col>
             <v-select :rules="rules.select" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
             </v-col>
+            <v-icon v-tooltip.auto="{ content: item.dish_name }" size="medium">mdi-information-outline</v-icon>
             <v-col>
-            <v-select :rules="rules.select" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
+            <v-select  :rules="rules.select" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
             </v-col>
+            <v-icon v-tooltip.bottom-end="{ content: 'dish_name' }" size="medium">mdi-information-outline</v-icon>
             <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
                 <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
             </v-col>
         </v-row>
         </p>
         </div>
-        <v-btn v-if="payload" @click="submitHogg()">submit</v-btn>
+        <v-btn @click="submitHogg()">submit</v-btn>
 </form>
   </v-container>
 </template>
@@ -70,6 +72,7 @@ export default {
             const configs = await this.getConfigs()
             const todaysConfigs = configs.filter(x => x.day == today)
             this.configs = todaysConfigs
+            console.log('todaysConfigs',todaysConfigs)
         },
         async getConfigs(){
             const res = await this.$axios.get(`/menu-config/${this.mess_id}`,{
