@@ -7,13 +7,12 @@
         <p v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
             <v-row>
             <v-col>
-            <v-select :rules="rules.select" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
+            <v-select :hint="item.dish_name" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
             </v-col>
-            <v-icon v-tooltip.auto="{ content: item.dish_name }" size="medium">mdi-information-outline</v-icon>
+            <!-- <v-icon v-tooltip.auto="{ content: item.dish_name }" size="medium">mdi-information-outline</v-icon> -->
             <v-col>
-            <v-select  :rules="rules.select" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
+            <v-select :hint="item.next_dish_name" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
             </v-col>
-            <v-icon v-tooltip.bottom-end="{ content: 'dish_name' }" size="medium">mdi-information-outline</v-icon>
             <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
                 <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
             </v-col>
@@ -40,9 +39,6 @@ export default {
             meals: null,
             hogg_val: null,
             payload: null,
-            rules: {
-                select: [(v) => !!v || "Item is required"],
-                }
         }
     },
     mounted(){
@@ -61,18 +57,32 @@ export default {
             if(messConfigRes.data && messConfigRes.data.message !== 'Success') return
             const config_list = messConfigRes.data.data.meal_config.split(',')
             const configMeals = mealsRes.data.data.filter(x=>config_list.includes(x.name))
-
             this.days = dayRes.data.data
             this.meals = configMeals
+            const configs = await this.getConfigs()
 
-            var today = new Date().getDay()
+            var todayDate = new Date()
+            var today = todayDate.getDay()
             if(today == 0) today = 7
             this.selectedDay = today
-
-            const configs = await this.getConfigs()
             const todaysConfigs = configs.filter(x => x.day == today)
-            this.configs = todaysConfigs
             console.log('todaysConfigs',todaysConfigs)
+
+            var nextDate = new Date(new Date().setDate(todayDate.getDate()+1))
+            var nextDay = nextDate.getDay()
+            if(nextDay == 0) nextDay = 7
+            const nextConfigs = configs.filter(x => x.day == nextDay)
+            
+            for(let today of todaysConfigs){
+                today.next_dish_name = null
+                for(let nextDay of nextConfigs ){
+                    if(today.day === (nextDay.day -1) && today.meal_id === nextDay.meal_id){
+                        today.next_dish_name = nextDay.dish_name
+                    }
+                }
+            }
+            this.configs = todaysConfigs            
+            console.log('finale', this.configs)
         },
         async getConfigs(){
             const res = await this.$axios.get(`/menu-config/${this.mess_id}`,{
@@ -98,12 +108,6 @@ export default {
         async submitHogg(){
             const payload = this.hoggPayload();
             this.payload = payload
-            for (let item of payload){
-                if(!item.status || !item.next){
-                    this.$toasted.info('Fill required fields')
-                    return;
-                }
-            }
             const res = await this.$axios.post('/hogg',payload,{
                 headers:{
                     Authorization: this.$storage.getUniversal('token')
@@ -113,7 +117,8 @@ export default {
             if(res.data && res.data.message === 'Success'){
                 this.$toasted.success('submitted')
             }else{
-                this.$toasted.error('failed')
+                console.log(res.data.content)
+                this.$toasted.error(res.data.message === 'Fail' ? res.data.content : 'Fail' )
             }
         },
         hoggPayload(){
