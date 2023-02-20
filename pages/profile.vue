@@ -10,10 +10,10 @@
 </v-row>
   <v-row v-if="userInfo.mobile && userInfo.email" align="center">
       <v-col>
-      <p>Name: {{this.userInfo.name}}</p>
-      <p>email: {{this.userInfo.email}}</p>
-      <p>Mobile: {{this.userInfo.mobile}}</p>
-      <p>Room: {{this.userInfo.room}}</p></v-col>
+      <p>Name : <b>{{this.userInfo.name}}</b></p>
+      <p>email: <b>{{this.userInfo.email}}</b></p>
+      <p>Mobile: <b>{{this.userInfo.mobile}}</b></p>
+      <p>Room: <b>{{this.userInfo.room}}</b></p></v-col>
     </v-row>
     <v-row>
 
