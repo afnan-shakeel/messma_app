@@ -56,7 +56,7 @@ export default {
   ],
 
   axios: {
-    baseURL: 'http://localhost:8000'
+    baseURL: 'http://devapi.asxvec.in'
   },
   
   // PWA module configuration: https://go.nuxtjs.dev/pwa
