@@ -1,26 +1,33 @@
 <template>
   <v-container id="container">
-    <form>
+    <v-row>
+        <v-col>
         <p v-if="days && selectedDay">Day: {{ days.filter(x=> x.id === selectedDay)[0].name}}</p>
-        <div v-if="configs && meals && hogg_val" data-app>
-        
-        <p v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
-            <v-row>
-            <v-col>
-            <v-select :hint="item.dish_name" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
-            </v-col>
-            <!-- <v-icon v-tooltip.auto="{ content: item.dish_name }" size="medium">mdi-information-outline</v-icon> -->
-            <v-col>
-            <v-select :hint="item.next_dish_name" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
-            </v-col>
-            <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
-                <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
-            </v-col>
-        </v-row>
-        </p>
-        </div>
-        <v-btn @click="submitHogg()">submit</v-btn>
-</form>
+    </v-col>
+    </v-row>
+        <v-row>
+            <form>
+            <div v-if="configs && meals && hogg_val" data-app>
+            
+            <p style="padding: 8px 0px 0px 8px;font-size: 0.8em;" v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
+                <v-row>
+                <v-col>
+                <v-select :hint="item.dish_name" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
+                </v-col>
+                <!-- <v-icon v-tooltip.auto="{ content: item.dish_name }" size="medium">mdi-information-outline</v-icon> -->
+                <v-col>
+                <v-select :hint="item.next_dish_name" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
+                </v-col>
+                <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
+                    <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
+                </v-col>
+            </v-row>
+            </p>
+            
+            <v-btn @click="submitHogg()">submit</v-btn>
+            </div>
+    </form>
+    </v-row>
   </v-container>
 </template>
 
