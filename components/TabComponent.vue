@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <v-bottom-navigation
-    color="primary"
-  >
+    absolute
+    >
     <v-btn>
       <span>Home</span>
 

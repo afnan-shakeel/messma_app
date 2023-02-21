@@ -32,7 +32,6 @@ export default {
     { src: '~/plugins/vue.modal', mode: 'client' },
     { src: '~/plugins/vue-toasted.js', mode: 'client' },
     { src: '~/plugins/v-tooltip.js', mode: 'client' },
-
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -40,10 +39,8 @@ export default {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
-    // https://go.nuxtjs.dev/eslint
 
-    // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss',
+    // '@nuxtjs/tailwindcss',
     '@nuxtjs/vuetify',
   ],
 
@@ -54,6 +51,25 @@ export default {
     '@nuxtjs/pwa',
     '@nuxtjs/universal-storage'
   ],
+
+  
+  vuetify: {
+    customVariables: ['~/assets/variables.scss'],
+    theme: {
+        dark: false,
+        themes: {
+            dark: {
+                primary: colors.blue.darken2,
+                accent: colors.grey.darken3,
+                secondary: colors.amber.darken3,
+                info: colors.teal.lighten1,
+                warning: colors.amber.base,
+                error: colors.deepOrange.accent4,
+                success: colors.green.accent3
+            }
+        }
+    }
+  },
 
   axios: {
     baseURL: 'http://devapi.asxvec.in'
@@ -71,24 +87,6 @@ export default {
     },
     manifest: {
       lang: 'en'
-    }
-  },
-
-  vuetify: {
-    customVariables: [],
-    theme: {
-        dark: false,
-        themes: {
-            dark: {
-                primary: colors.blue.darken2,
-                accent: colors.grey.darken3,
-                secondary: colors.amber.darken3,
-                info: colors.teal.lighten1,
-                warning: colors.amber.base,
-                error: colors.deepOrange.accent4,
-                success: colors.green.accent3
-            }
-        }
     }
   },
 

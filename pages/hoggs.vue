@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container id="container">
     <form>
         <p v-if="days && selectedDay">Day: {{ days.filter(x=> x.id === selectedDay)[0].name}}</p>
         <div v-if="configs && meals && hogg_val" data-app>
@@ -143,6 +143,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+#container {
+    font-family:'Roboto', sans-serif;
+}
 </style>
