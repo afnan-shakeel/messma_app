@@ -9,7 +9,7 @@
     width="120"
     ></v-img>
     </v-col>
-      <v-simple-table width="auto">
+      <v-simple-table width="100%">
         <tbody>
           <tr><th>Name:</th>
             <td>{{this.userInfo.name}}</td></tr>

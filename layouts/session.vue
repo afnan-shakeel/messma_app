@@ -2,10 +2,10 @@
     <v-container>
 
         <nuxt/>
-
+      <!-- <v-layout class="fixed-bottom" style="height: 56px;"> -->
       <v-bottom-navigation
-      color="primary"
-    >
+      :absolute='true'
+      >
       <!-- <v-btn>
         <span>Home</span>
   
@@ -24,6 +24,7 @@
         <v-icon @click="toProfile()" >mdi-account</v-icon>
       </v-btn>
     </v-bottom-navigation>
+    <!-- </v-layout> -->
     </v-container>
   </template>
   
