@@ -5,11 +5,11 @@
     <v-img 
     id="round-avatar"
     src="https://library.kissclipart.com/20190227/shw/kissclipart-patient-icon-png-clipart-computer-icons-ac058a2675899cf9.png"
-    height="75"
-    width="75"
+    height="120"
+    width="120"
     ></v-img>
     </v-col>
-      <v-simple-table width="400">
+      <v-simple-table width="auto">
         <tbody>
           <tr><th>Name:</th>
             <td>{{this.userInfo.name}}</td></tr>
@@ -91,8 +91,6 @@ export default {
 <style scoped>
 #round-avatar {
   border-radius: 50%; 
-  min-height: 150px;
-  min-width: 150px;
 }
 #container {
     font-family:'Roboto', sans-serif;

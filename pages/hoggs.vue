@@ -1,12 +1,12 @@
 <template>
-  <v-container id="container">
+  <v-container id="container" v-if="enableLog">
     <v-row>
         <v-col>
         <p v-if="days && selectedDay">Day: {{ days.filter(x=> x.id === selectedDay)[0].name}}</p>
     </v-col>
     </v-row>
         <v-row>
-            <form>
+            <form>  
             <div v-if="configs && meals && hogg_val" data-app>
             
             <p style="padding: 8px 0px 0px 8px;font-size: 0.8em;" v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
@@ -19,6 +19,9 @@
                 <v-select :hint="item.next_dish_name" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
                 </v-col>
                 <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
+                    <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
+                </v-col>
+                <v-col v-if="item.nextStatus && item.nextStatus === 'MANY'">
                     <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
                 </v-col>
             </v-row>
@@ -46,6 +49,8 @@ export default {
             meals: null,
             hogg_val: null,
             payload: null,
+            messConfig: null,
+            enableLog: false,
         }
     },
     mounted(){
@@ -53,16 +58,22 @@ export default {
         this.getHoggVal();
     },
     methods:{
+
         async getDayConfig(){
             const dayRes = await this.$axios.get('/ext/days')
             const mealsRes = await this.$axios.get('/ext/meals')
-            const messConfigRes = await this.$axios.get(`/mess/${this.mess_id}/config`,{
+            const messConfigRes = await this.$axios.get(`/mess/${this.mess_id}`,{
                 headers:{
                     Authorization: this.$storage.getUniversal('token')
                 }
             });
             if(messConfigRes.data && messConfigRes.data.message !== 'Success') return
-            const config_list = messConfigRes.data.data.meal_config.split(',')
+            this.messConfig = messConfigRes.data.data.mess_config
+            var currtime = new Date(new Date().setHours(new Date().getHours() + 5, new Date().getMinutes() + 30)).toTimeString().split(' ')[0]
+            var endtime = new Date(this.messConfig.sleep_time).toTimeString().split(' ')[0]
+            this.enableLog = currtime <= endtime
+            console.log('enableLog',this.enableLog)
+            const config_list = messConfigRes.data.data.mess_config.meal_config.split(',')
             const configMeals = mealsRes.data.data.filter(x=>config_list.includes(x.name))
             this.days = dayRes.data.data
             this.meals = configMeals
@@ -88,8 +99,7 @@ export default {
                     }
                 }
             }
-            this.configs = todaysConfigs            
-            console.log('finale', this.configs)
+            this.configs = todaysConfigs       
         },
         async getConfigs(){
             const res = await this.$axios.get(`/menu-config/${this.mess_id}`,{
@@ -146,6 +156,27 @@ export default {
             // console.log(payloadList)
         }
 
+    },
+    watch:{
+        configs:{
+            handler: function (val,old){ 
+            if(val && val.length>0){
+                for(let x of val){
+                    if(x.nextStatus==='MANY' && (Number(x.remark) > this.messConfig.max_many) ){
+                        x.remark = null
+                        x.nextStatus = null
+                        this.$toasted.info(`Many limit is ${this.messConfig.max_many}`)
+                        }
+                    if(x.nextStatus==='EXTRA' && (Number(x.remark) > this.messConfig.max_extra) ){
+                        x.remark = null
+                        x.nextStatus = null
+                        this.$toasted.info(`Extra limit is ${this.messConfig.max_extra}`)
+                        }
+                    }
+                }
+            },
+            deep: true
+        }
     }
 }
 </script>
