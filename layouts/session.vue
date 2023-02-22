@@ -4,7 +4,7 @@
         <nuxt/>
       <!-- <v-layout class="fixed-bottom" style="height: 56px;"> -->
       <v-bottom-navigation
-      :absolute='true'
+      :fixed='true'
       >
       <!-- <v-btn>
         <span>Home</span>
