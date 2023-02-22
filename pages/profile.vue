@@ -9,6 +9,7 @@
     width="120"
     ></v-img>
     </v-col>
+    <v-flex md6 style="overflow: auto"> 
       <v-simple-table width="100%">
         <tbody>
           <tr><th>Name:</th>
@@ -26,6 +27,7 @@
             <td align="right"><v-icon @click="logout()">mdi-chevron-right</v-icon></td></tr>
         </tbody>
       </v-simple-table>
+      </v-flex>
     </v-container>
       <v-card dark v-if="updatePasscode">
         <reset-passcode v-if="userInfo.mobile && userInfo.email" v-bind:userInfo="userInfo"></reset-passcode>
