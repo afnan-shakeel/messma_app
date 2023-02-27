@@ -12,16 +12,16 @@
             <p style="padding: 8px 0px 0px 8px;font-size: 0.8em;" v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
                 <v-row>
                 <v-col>
-                <v-select :hint="item.dish_name" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
+                <v-select :hint="item.dish_name" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA PC(S)'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
                 </v-col>
                 <!-- <v-icon v-tooltip.auto="{ content: item.dish_name }" size="medium">mdi-information-outline</v-icon> -->
                 <v-col>
                 <v-select :hint="item.next_dish_name" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
                 </v-col>
-                <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
+                <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA PC(S)'">
                     <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
                 </v-col>
-                <v-col v-if="item.nextStatus && item.nextStatus === 'MANY'">
+                <v-col v-if="item.nextStatus && item.nextStatus === 'PLUS MEAL'">
                     <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
                 </v-col>
             </v-row>
@@ -162,12 +162,12 @@ export default {
             handler: function (val,old){ 
             if(val && val.length>0){
                 for(let x of val){
-                    if(x.nextStatus==='MANY' && (Number(x.remark) > this.messConfig.max_many) ){
+                    if(x.nextStatus==='PLUS MEAL' && (Number(x.remark) > this.messConfig.max_many) ){
                         x.remark = null
                         x.nextStatus = null
-                        this.$toasted.info(`Many limit is ${this.messConfig.max_many}`)
+                        this.$toasted.info(`PLUS MEAL limit is ${this.messConfig.max_many}`)
                         }
-                    if(x.nextStatus==='EXTRA' && (Number(x.remark) > this.messConfig.max_extra) ){
+                    if(x.nextStatus==='EXTRA PC(s)' && (Number(x.remark) > this.messConfig.max_extra) ){
                         x.remark = null
                         x.nextStatus = null
                         this.$toasted.info(`Extra limit is ${this.messConfig.max_extra}`)
