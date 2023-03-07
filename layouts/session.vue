@@ -2,20 +2,20 @@
     <v-container>
 
         <nuxt/>
-
+      <!-- <v-layout class="fixed-bottom" style="height: 56px;"> -->
       <v-bottom-navigation
-      color="primary"
-    >
-      <v-btn>
+      :fixed='true'
+      >
+      <!-- <v-btn>
         <span>Home</span>
   
         <v-icon @click="toDashboard()">mdi-home</v-icon>
-      </v-btn>
+      </v-btn> -->
   
       <v-btn>
-        <span>O</span>
+        <span>Home</span>
   
-        <v-icon @click="toHoggs()">mdi-heart</v-icon>
+        <v-icon @click="toHoggs()">mdi-home</v-icon>
       </v-btn>
   
       <v-btn>
@@ -24,6 +24,7 @@
         <v-icon @click="toProfile()" >mdi-account</v-icon>
       </v-btn>
     </v-bottom-navigation>
+    <!-- </v-layout> -->
     </v-container>
   </template>
   
@@ -31,9 +32,9 @@
   export default {
     name:'SessionLayout',
     methods:{
-        toDashboard(){
-            this.$router.push('/dashboard')
-        },
+        // toDashboard(){
+        //     this.$router.push('/dashboard')
+        // },
         toProfile(){
             this.$router.push('/profile')
         },

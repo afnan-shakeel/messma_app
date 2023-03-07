@@ -31,7 +31,7 @@ export default {
   plugins: [
     { src: '~/plugins/vue.modal', mode: 'client' },
     { src: '~/plugins/vue-toasted.js', mode: 'client' },
-
+    { src: '~/plugins/v-tooltip.js', mode: 'client' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -39,10 +39,8 @@ export default {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
-    // https://go.nuxtjs.dev/eslint
 
-    // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss',
+    // '@nuxtjs/tailwindcss',
     '@nuxtjs/vuetify',
   ],
 
@@ -54,25 +52,7 @@ export default {
     '@nuxtjs/universal-storage'
   ],
 
-  axios: {
-    baseURL: 'http://localhost:8000'
-  },
   
-  // PWA module configuration: https://go.nuxtjs.dev/pwa
-  pwa: {
-    charset: 'utf-8',
-    name: 'Messma',
-    description: 'Messma: mess',
-    author: 'Afnan Shakeel <afnanshakeel@gmail.com>',
-    viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no',
-    icon:{
-      fileName: "icon.png",
-    },
-    manifest: {
-      lang: 'en'
-    }
-  },
-
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
@@ -91,9 +71,28 @@ export default {
     }
   },
 
+  axios: {
+    baseURL: 'http://devapi.asxvec.in'
+  },
+  
+  // PWA module configuration: https://go.nuxtjs.dev/pwa
+  pwa: {
+    charset: 'utf-8',
+    name: 'Messma',
+    description: 'Messma: mess',
+    author: 'Afnan Shakeel <afnanshakeel@gmail.com>',
+    viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no',
+    icon:{
+      fileName: "icon.png",
+    },
+    manifest: {
+      lang: 'en'
+    }
+  },
+
   server: {
-    host: '0.0.0.0',
-    port: 8002,
+    host: '127.0.0.1',
+    port: 8012,
   },
 
 

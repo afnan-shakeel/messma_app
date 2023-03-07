@@ -1,25 +1,36 @@
 <template>
-  <v-container>
-    <form>
+  <v-container id="container" v-if="enableLog">
+    <v-row>
+        <v-col>
         <p v-if="days && selectedDay">Day: {{ days.filter(x=> x.id === selectedDay)[0].name}}</p>
-        <div v-if="configs && meals && hogg_val" data-app>
-        
-        <p v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
-            <v-row>
-            <v-col>
-            <v-select :rules="rules.select" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
-            </v-col>
-            <v-col>
-            <v-select :rules="rules.select" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
-            </v-col>
-            <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA'">
-                <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
-            </v-col>
-        </v-row>
-        </p>
-        </div>
-        <v-btn v-if="payload" @click="submitHogg()">submit</v-btn>
-</form>
+    </v-col>
+    </v-row>
+        <v-row>
+            <form>  
+            <div v-if="configs && meals && hogg_val" data-app>
+            
+            <p style="padding: 8px 0px 0px 8px;font-size: 0.8em;" v-for="item in configs" :key="item.id">{{meals.filter(x => x.id === item.meal_id)[0].name}}: 
+                <v-row>
+                <v-col>
+                <v-select :hint="item.dish_name" v-model="item.currentStatus" :items="hogg_val.filter(x=>!['EXTRA PC(S)'].includes(x.name))" item-text="name" item-value="name" label="current meal" dense outlined clearable></v-select>
+                </v-col>
+                <!-- <v-icon v-tooltip.auto="{ content: item.dish_name }" size="medium">mdi-information-outline</v-icon> -->
+                <v-col>
+                <v-select :hint="item.next_dish_name" v-model="item.nextStatus" :items="hogg_val.filter(x=>!['NF','ALLOWED'].includes(x.name))" item-text="name" item-value="name" label="next meal" dense outlined clearable></v-select>
+                </v-col>
+                <v-col v-if="item.nextStatus && item.nextStatus === 'EXTRA PC(S)'">
+                    <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
+                </v-col>
+                <v-col v-if="item.nextStatus && item.nextStatus === 'PLUS MEAL'">
+                    <v-text-field v-model="item.remark" type="number" label="count" outlined dense></v-text-field>
+                </v-col>
+            </v-row>
+            </p>
+            
+            <v-btn @click="submitHogg()">submit</v-btn>
+            </div>
+    </form>
+    </v-row>
   </v-container>
 </template>
 
@@ -38,9 +49,8 @@ export default {
             meals: null,
             hogg_val: null,
             payload: null,
-            rules: {
-                select: [(v) => !!v || "Item is required"],
-                }
+            messConfig: null,
+            enableLog: false,
         }
     },
     mounted(){
@@ -48,28 +58,48 @@ export default {
         this.getHoggVal();
     },
     methods:{
+
         async getDayConfig(){
             const dayRes = await this.$axios.get('/ext/days')
             const mealsRes = await this.$axios.get('/ext/meals')
-            const messConfigRes = await this.$axios.get(`/mess/${this.mess_id}/config`,{
+            const messConfigRes = await this.$axios.get(`/mess/${this.mess_id}`,{
                 headers:{
                     Authorization: this.$storage.getUniversal('token')
                 }
             });
             if(messConfigRes.data && messConfigRes.data.message !== 'Success') return
-            const config_list = messConfigRes.data.data.meal_config.split(',')
+            this.messConfig = messConfigRes.data.data.mess_config
+            var currtime = new Date(new Date().setHours(new Date().getHours() + 5, new Date().getMinutes() + 30)).toTimeString().split(' ')[0]
+            var endtime = new Date(this.messConfig.sleep_time).toTimeString().split(' ')[0]
+            this.enableLog = currtime <= endtime
+            console.log('enableLog',this.enableLog)
+            const config_list = messConfigRes.data.data.mess_config.meal_config.split(',')
             const configMeals = mealsRes.data.data.filter(x=>config_list.includes(x.name))
-
             this.days = dayRes.data.data
             this.meals = configMeals
+            const configs = await this.getConfigs()
 
-            var today = new Date().getDay()
+            var todayDate = new Date()
+            var today = todayDate.getDay()
             if(today == 0) today = 7
             this.selectedDay = today
-
-            const configs = await this.getConfigs()
             const todaysConfigs = configs.filter(x => x.day == today)
-            this.configs = todaysConfigs
+            console.log('todaysConfigs',todaysConfigs)
+
+            var nextDate = new Date(new Date().setDate(todayDate.getDate()+1))
+            var nextDay = nextDate.getDay()
+            if(nextDay == 0) nextDay = 7
+            const nextConfigs = configs.filter(x => x.day == nextDay)
+            
+            for(let today of todaysConfigs){
+                today.next_dish_name = null
+                for(let nextDay of nextConfigs ){
+                    if(today.day === (nextDay.day -1) && today.meal_id === nextDay.meal_id){
+                        today.next_dish_name = nextDay.dish_name
+                    }
+                }
+            }
+            this.configs = todaysConfigs       
         },
         async getConfigs(){
             const res = await this.$axios.get(`/menu-config/${this.mess_id}`,{
@@ -95,12 +125,6 @@ export default {
         async submitHogg(){
             const payload = this.hoggPayload();
             this.payload = payload
-            for (let item of payload){
-                if(!item.status || !item.next){
-                    this.$toasted.info('Fill required fields')
-                    return;
-                }
-            }
             const res = await this.$axios.post('/hogg',payload,{
                 headers:{
                     Authorization: this.$storage.getUniversal('token')
@@ -110,7 +134,8 @@ export default {
             if(res.data && res.data.message === 'Success'){
                 this.$toasted.success('submitted')
             }else{
-                this.$toasted.error('failed')
+                console.log(res.data.content)
+                this.$toasted.error(res.data.message === 'Fail' ? res.data.content : 'Fail' )
             }
         },
         hoggPayload(){
@@ -131,10 +156,33 @@ export default {
             // console.log(payloadList)
         }
 
+    },
+    watch:{
+        configs:{
+            handler: function (val,old){ 
+            if(val && val.length>0){
+                for(let x of val){
+                    if(x.nextStatus==='PLUS MEAL' && (Number(x.remark) > this.messConfig.max_many) ){
+                        x.remark = null
+                        x.nextStatus = null
+                        this.$toasted.info(`PLUS MEAL limit is ${this.messConfig.max_many}`)
+                        }
+                    if(x.nextStatus==='EXTRA PC(s)' && (Number(x.remark) > this.messConfig.max_extra) ){
+                        x.remark = null
+                        x.nextStatus = null
+                        this.$toasted.info(`Extra limit is ${this.messConfig.max_extra}`)
+                        }
+                    }
+                }
+            },
+            deep: true
+        }
     }
 }
 </script>
 
-<style>
-
+<style scoped>
+#container {
+    font-family:'Roboto', sans-serif;
+}
 </style>
