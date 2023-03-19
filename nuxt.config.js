@@ -72,7 +72,7 @@ export default {
   },
 
   axios: {
-    baseURL: 'http://devapi.asxvec.in'
+    baseURL: 'http://api.asxvec.in'
   },
   
   // PWA module configuration: https://go.nuxtjs.dev/pwa
@@ -92,7 +92,7 @@ export default {
 
   server: {
     host: '127.0.0.1',
-    port: 8012,
+    port: 8002,
   },
 
 
