@@ -124,6 +124,7 @@ export default {
         },
         async submitHogg(){
             const payload = this.hoggPayload();
+            if(!payload) return
             this.payload = payload
             const res = await this.$axios.post('/hogg',payload,{
                 headers:{
@@ -143,6 +144,21 @@ export default {
             const mess_id = this.$storage.getUniversal('user').data.mess_id
             const user_id = this.$storage.getUniversal('user').data.user_id
             for (let item of this.configs){
+                if(['EXTRA PC(S)','PLUS MEAL'].includes(item.nextStatus) && /^\d+$/.test(remark)!==true ){
+
+                    if(item.nextStatus==='PLUS MEAL' && (Number(item.remark) > this.messConfig.max_many) ){
+                        item.remark = null
+                        item.nextStatus = null
+                        this.$toasted.info(`PLUS MEAL limit is ${this.messConfig.max_many}`)
+                        return;
+                    }
+                    if(item.nextStatus==='EXTRA PC(S)' && (Number(item.remark) > this.messConfig.max_extra) ){
+                        item.remark = null
+                        item.nextStatus = null
+                        this.$toasted.info(`Extra limit is ${this.messConfig.max_extra}`)
+                        return;
+                    }
+                }
                 const data = {}
                 data.user_id = user_id
                 data.mess_id = mess_id
@@ -157,27 +173,7 @@ export default {
         }
 
     },
-    watch:{
-        configs:{
-            handler: function (val,old){ 
-            if(val && val.length>0){
-                for(let x of val){
-                    if(x.nextStatus==='PLUS MEAL' && (Number(x.remark) > this.messConfig.max_many) ){
-                        x.remark = null
-                        x.nextStatus = null
-                        this.$toasted.info(`PLUS MEAL limit is ${this.messConfig.max_many}`)
-                        }
-                    if(x.nextStatus==='EXTRA PC(s)' && (Number(x.remark) > this.messConfig.max_extra) ){
-                        x.remark = null
-                        x.nextStatus = null
-                        this.$toasted.info(`Extra limit is ${this.messConfig.max_extra}`)
-                        }
-                    }
-                }
-            },
-            deep: true
-        }
-    }
+    
 }
 </script>
 
