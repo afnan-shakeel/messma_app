@@ -1,7 +1,8 @@
-<template lang="pug">
-div
-    p.tracking-(v-if="title") {{ title }}
-    p.text-md {{ lead }}
+<template>
+<div>
+    <p v-if="title"> {{ title }}</p>
+    <p> {{ lead }}</p>
+</div>
 </template>
         
 <script>

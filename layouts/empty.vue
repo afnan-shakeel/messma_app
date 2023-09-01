@@ -1,4 +1,4 @@
-<template lang="pug">
+<template>
 <div class="container.w-96.min-h-screen.mx-auto.font-primary.bg-primary.shadow-2xl">
 
 </div>
